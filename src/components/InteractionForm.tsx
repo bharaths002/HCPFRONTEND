@@ -8,7 +8,7 @@ import {
   removeMaterial,
   removeSample,
   setSentiment,
-  saveInteraction,
+  saveInteractionThunk,
   resetForm
 } from '../store/interactionSlice';
 import {
@@ -40,14 +40,14 @@ export const InteractionForm: React.FC = () => {
   const form = useAppSelector((state) => state.interaction.form);
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col h-[740px] sticky top-20 overflow-hidden">
       {/* Section Title */}
-      <div className="border-b border-slate-200 pb-4">
+      <div className="px-6 sm:px-8 pt-6 sm:pt-8 pb-4 border-b border-slate-200 shrink-0">
         <h2 className="text-lg font-bold text-slate-900 tracking-tight">Interaction Details</h2>
         <p className="text-xs text-slate-500 mt-0.5">Fill out structured form fields or use the AI Assistant chat on the right.</p>
       </div>
 
-      <div className="space-y-5">
+      <div className="flex-1 overflow-y-auto px-6 sm:px-8 py-5 space-y-5">
         {/* Row 1: HCP Name & Interaction Type */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
@@ -83,9 +83,9 @@ export const InteractionForm: React.FC = () => {
               <option value="Meeting">Meeting</option>
               <option value="Call">Call</option>
               <option value="Email">Email</option>
-              <option value="Dinner">Dinner</option>
-              <option value="Symposium">Symposium</option>
-              <option value="Advisory Board">Advisory Board</option>
+              <option value="Virtual Meeting">Virtual Meeting</option>
+              <option value="Conference">Conference</option>
+              <option value="Other">Other</option>
             </select>
           </div>
         </div>
@@ -324,7 +324,7 @@ export const InteractionForm: React.FC = () => {
       </div>
 
       {/* Form Action Buttons */}
-      <div className="pt-4 border-t border-slate-200 flex items-center justify-end space-x-3">
+      <div className="px-6 sm:px-8 py-4 border-t border-slate-200 flex items-center justify-end space-x-3 shrink-0 bg-white">
         <button
           type="button"
           onClick={() => dispatch(resetForm())}
@@ -334,7 +334,7 @@ export const InteractionForm: React.FC = () => {
         </button>
         <button
           type="button"
-          onClick={() => dispatch(saveInteraction())}
+          onClick={() => dispatch(saveInteractionThunk())}
           className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-all shadow-sm flex items-center space-x-2"
         >
           <CheckCircle className="w-4 h-4" />

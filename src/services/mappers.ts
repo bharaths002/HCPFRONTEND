@@ -1,25 +1,23 @@
 import { InteractionState, MaterialItem, SampleItem, InteractionType, SentimentType } from '../types';
 
 // --- Interaction type: frontend Title Case <-> backend lowercase enum ---
-// Backend only supports: meeting, call, email, virtual_meeting, conference, other.
-// Dinner/Symposium/Advisory Board don't have exact backend equivalents — adjust
-// this mapping if you'd rather they land somewhere else.
+// Direct 1:1 mapping — frontend options now match the backend enum exactly.
 const TYPE_TO_BACKEND: Record<InteractionType, string> = {
   'Meeting': 'meeting',
   'Call': 'call',
   'Email': 'email',
-  'Dinner': 'other',
-  'Symposium': 'conference',
-  'Advisory Board': 'meeting',
+  'Virtual Meeting': 'virtual_meeting',
+  'Conference': 'conference',
+  'Other': 'other',
 };
 
 const TYPE_FROM_BACKEND: Record<string, InteractionType> = {
   meeting: 'Meeting',
   call: 'Call',
   email: 'Email',
-  virtual_meeting: 'Meeting',
-  conference: 'Symposium',
-  other: 'Dinner',
+  virtual_meeting: 'Virtual Meeting',
+  conference: 'Conference',
+  other: 'Other',
 };
 
 const SENTIMENT_TO_BACKEND: Record<SentimentType, string> = {
@@ -41,12 +39,57 @@ function combineDateTime(date: string, time: string): string {
 }
 
 // ISO string -> { date: "DD-MM-YYYY", time: "HH:MM" }
-function splitDateTime(iso: string): { date: string; time: string } {
+export function splitDateTime(iso: string): { date: string; time: string } {
   const d = new Date(iso);
   const pad = (n: number) => String(n).padStart(2, '0');
   return {
     date: `${pad(d.getUTCDate())}-${pad(d.getUTCMonth() + 1)}-${d.getUTCFullYear()}`,
     time: `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`,
+  };
+}
+
+export interface BackendSavedInteraction {
+  id: number;
+  hcp_id: number;
+  hcp_name: string;
+  interaction_type: string;
+  interaction_datetime: string;
+  topics_discussed: string | null;
+  materials_shared: { name: string }[];
+  samples_distributed: { name: string; quantity: number }[];
+  sentiment: string | null;
+  outcomes: string | null;
+  follow_up_actions: string[];
+  ai_suggested_follow_ups: string[];
+  source: string;
+}
+
+// Backend list-all response -> the shape SavedInteractions.tsx already renders.
+export function backendInteractionToDisplay(item: BackendSavedInteraction) {
+  const { date, time } = splitDateTime(item.interaction_datetime);
+  return {
+    id: String(item.id),
+    hcpName: item.hcp_name,
+    interactionType: TYPE_FROM_BACKEND[item.interaction_type] ?? 'Meeting',
+    date,
+    time,
+    attendees: '',
+    topicsDiscussed: item.topics_discussed ?? '',
+    materialsShared: item.materials_shared.map((m, i) => ({
+      id: `mat-${item.id}-${i}`,
+      name: m.name,
+      category: 'Document',
+    })),
+    samplesDistributed: item.samples_distributed.map((s, i) => ({
+      id: `sam-${item.id}-${i}`,
+      name: s.name,
+      quantity: s.quantity,
+    })),
+    sentiment: (item.sentiment && SENTIMENT_FROM_BACKEND[item.sentiment]) || 'Neutral',
+    outcomes: item.outcomes ?? '',
+    followUpActions: item.follow_up_actions.map((a) => `• ${a}`).join('\n'),
+    aiSuggestedFollowUps: item.ai_suggested_follow_ups,
+    createdAt: item.interaction_datetime,
   };
 }
 
