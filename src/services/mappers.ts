@@ -1,4 +1,4 @@
-import { InteractionState, MaterialItem, SampleItem, InteractionType, SentimentType } from '../types';
+import { InteractionState, MaterialItem, SampleItem, InteractionType, SentimentType, LoggedInteraction } from '../types';
 
 // --- Interaction type: frontend Title Case <-> backend lowercase enum ---
 // Direct 1:1 mapping — frontend options now match the backend enum exactly.
@@ -65,11 +65,12 @@ export interface BackendSavedInteraction {
 }
 
 // Backend list-all response -> the shape SavedInteractions.tsx already renders.
-export function backendInteractionToDisplay(item: BackendSavedInteraction) {
+export function backendInteractionToDisplay(item: BackendSavedInteraction): LoggedInteraction {
   const { date, time } = splitDateTime(item.interaction_datetime);
   return {
     id: String(item.id),
     hcpName: item.hcp_name,
+    hcpId: item.hcp_id,
     interactionType: TYPE_FROM_BACKEND[item.interaction_type] ?? 'Meeting',
     date,
     time,
@@ -92,7 +93,6 @@ export function backendInteractionToDisplay(item: BackendSavedInteraction) {
     createdAt: item.interaction_datetime,
   };
 }
-
 export interface InteractionCreatePayload {
   hcp_id: number;
   interaction_type: string;
