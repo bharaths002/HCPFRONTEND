@@ -15,7 +15,7 @@ interface AppState {
   isSamplesModalOpen: boolean;
   toastMessage: string | null;
   // --- backend-session tracking ---
-  chatThreadId: string;         // one per browser session — same id across the whole conversation
+  chatThreadId: string;         // persisted in localStorage — survives page refreshes so the backend's checkpointer can resume the same conversation
   currentInteractionId: number | null; // set once the graph actually logs something this session
   awaitingConfirmation: boolean;       // true when the agent is waiting on a yes/no before logging
 }
@@ -43,6 +43,19 @@ function createEmptyForm(): InteractionState {
   };
 }
 
+// The thread ID itself must persist across refreshes (in localStorage) for
+// the backend's checkpointer to actually resume the same conversation — a
+// fresh random id every page load defeats it, since the backend has no way
+// to know it's "the same" conversation if the frontend never asks for it
+// under the same id.
+function getOrCreateThreadId(): string {
+  const existing = localStorage.getItem('hcp_chat_thread_id');
+  if (existing) return existing;
+  const newId = crypto.randomUUID();
+  localStorage.setItem('hcp_chat_thread_id', newId);
+  return newId;
+}
+
 const initialState: AppState = {
   form: createEmptyForm(),
   chatMessages: [
@@ -60,7 +73,7 @@ const initialState: AppState = {
   isMaterialsModalOpen: false,
   isSamplesModalOpen: false,
   toastMessage: null,
-  chatThreadId: crypto.randomUUID(),
+  chatThreadId: getOrCreateThreadId(),
   currentInteractionId: null,
   awaitingConfirmation: false,
 };
