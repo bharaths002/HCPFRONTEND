@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
-import { useAppSelector, useAppDispatch } from '../store/store';
-import { setCurrentView } from '../store/interactionSlice';
+import React, { useState, useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from '../store/store';
+import { setCurrentView, fetchSavedInteractions } from '../store/interactionSlice';
 import { Calendar, Clock, User, Smile, Meh, Frown, FileText, Search, Plus } from 'lucide-react';
 
 export const SavedInteractions: React.FC = () => {
   const dispatch = useAppDispatch();
   const saved = useAppSelector((state) => state.interaction.savedInteractions);
   const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    dispatch(fetchSavedInteractions());
+  }, [dispatch]);
 
   const filtered = saved.filter(
     (item) =>

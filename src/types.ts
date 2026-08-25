@@ -1,5 +1,4 @@
-export type InteractionType = 'Meeting' | 'Call' | 'Email' | 'Dinner' | 'Symposium' | 'Advisory Board';
-
+export type InteractionType = 'Meeting' | 'Call' | 'Email' | 'Virtual Meeting' | 'Conference' | 'Other';
 export type SentimentType = 'Positive' | 'Neutral' | 'Negative';
 
 export interface MaterialItem {
@@ -15,6 +14,7 @@ export interface SampleItem {
 }
 
 export interface InteractionState {
+  hcpId: number | null;
   hcpName: string;
   interactionType: InteractionType;
   date: string;

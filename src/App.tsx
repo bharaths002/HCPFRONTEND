@@ -1,17 +1,8 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React from 'react';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
-import { useAppSelector } from './store/store';
+import { useAppSelector, useAppDispatch } from './store/store';
+import { fetchSavedInteractions } from './store/interactionSlice';
 import { Header } from './components/Header';
 import { InteractionForm } from './components/InteractionForm';
 import { AiAssistantChat } from './components/AiAssistantChat';
@@ -23,6 +14,11 @@ import { Toast } from './components/Toast';
 
 const MainContent: React.FC = () => {
   const currentView = useAppSelector((state) => state.interaction.currentView);
+   const dispatch = useAppDispatch();
+
+     React.useEffect(() => {
+    dispatch(fetchSavedInteractions());
+  }, [dispatch]);
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
